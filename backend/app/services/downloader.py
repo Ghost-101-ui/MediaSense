@@ -30,17 +30,11 @@ class MediaExtractor:
             'source_address': '0.0.0.0', 
             'outtmpl': '%(title)s.%(ext)s',
             # Anti-bot measures
-            'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+            'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
             'sleep_interval': random.randint(2, 5),
-            'extractor_args': {
-                'youtube': {
-                    # 'web' client is most heavily guarded. Use 'android' or 'ios'.
-                    'player_client': ['android', 'ios'],
-                    'skip': ['hls', 'dash']
-                }
-            },
+            # Removed specific player_client args to let new yt-dlp version handle defaults
             'http_headers': {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
                 'Accept-Language': 'en-US,en;q=0.9',
                 'Sec-Fetch-Mode': 'navigate',
