@@ -39,7 +39,7 @@ export default function PreviewCard({ data, url }: PreviewCardProps) {
         formatId?: string
     }>({ status: 'idle', progress: 0 });
 
-    const API_URL = "http://localhost:8000/api/v1";
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
     const handleDownload = async (formatId: string) => {
         setDownloadState({ status: 'starting', progress: 0, formatId });
