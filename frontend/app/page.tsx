@@ -79,6 +79,23 @@ export default function Home() {
         </p>
 
         <div className="w-full max-w-xl mx-auto space-y-8">
+          {/* Availability Notice */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-200 p-4 rounded-xl text-sm md:text-base flex gap-3 items-start backdrop-blur-sm"
+          >
+            <span className="text-xl">🚧</span>
+            <div>
+              <p className="font-semibold text-yellow-100 mb-1">Coming Soon: YouTube & Instagram</p>
+              <p className="text-yellow-200/80">
+                We are currently optimizing our servers for YouTube and Instagram.
+                <br />
+                <span className="text-white font-medium">Please use X (Twitter) & Pinterest for now.</span>
+              </p>
+            </div>
+          </motion.div>
+
           <MediaInput
             value={url}
             onChange={setUrl}
