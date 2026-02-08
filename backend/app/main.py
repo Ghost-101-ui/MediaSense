@@ -52,10 +52,14 @@ def debug_cookies():
         if "# Netscape HTTP Cookie File" in decoded or "\t" in decoded:
             result["format_check"] = "Looks like Netscape format (GOOD)"
         else:
-            result["format_check"] = "Does NOT look like Netscape format (BAD)"
+            result["format_check"] = "Does NOT look like Netscape format (BAD - check export)"
             
     except Exception as e:
+        result["error"] = str(e)
         result["is_base64"] = False
-        result["decode_error"] = str(e)
         
+    # Check for FFmpeg (Critical for high quality merging)
+    import shutil
+    result["ffmpeg_installed"] = shutil.which("ffmpeg") is not None
+
     return result
