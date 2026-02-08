@@ -22,9 +22,8 @@ export default function Home() {
     setMediaData(null);
 
     try {
-      // Real API call
-      // Ensure backend URL is configured or use proxy. For now assume localhost:8000.
-      const API_URL = "http://127.0.0.1:8000/api/v1";
+      // Use environment variable for API URL, fallback to localhost for development
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1";
 
       const res = await fetch(`${API_URL}/analyze/?url=${encodeURIComponent(url)}`);
       if (!res.ok) {
