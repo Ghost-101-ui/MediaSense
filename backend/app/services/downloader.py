@@ -113,6 +113,13 @@ class MediaExtractor:
             # Simple filtering logic
             if height: # Video
                 res_str = f"{height}p"
+                
+                # Filter out storyboards/mhtml which often appear when main formats are blocked
+                if ext in ['mhtml', 'html', 'htm']:
+                    continue
+                if 'storyboard' in f.get('format_note', '') or 'storyboard' in f.get('protocol', ''):
+                    continue
+
                 # Removed 'ext != webm' check to allow VP9/AV1 formats which are standard now
                 if res_str not in seen_resolutions: 
                     formats.append({
