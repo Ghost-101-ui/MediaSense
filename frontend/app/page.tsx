@@ -6,6 +6,7 @@ import MediaInput from "@/components/MediaInput";
 import PreviewCard from "@/components/PreviewCard";
 import FloatingLines from "@/components/FloatingLines";
 import ShinyText from "@/components/ShinyText";
+import HowItWorks from "@/components/HowItWorks";
 
 export default function Home() {
   const [url, setUrl] = useState("");
@@ -124,6 +125,8 @@ export default function Home() {
               <PreviewCard data={mediaData} url={url} />
             )}
           </AnimatePresence>
+
+          {!mediaData && <HowItWorks />}
         </div>
       </motion.div>
 
