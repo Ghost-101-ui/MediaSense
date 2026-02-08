@@ -45,6 +45,10 @@ class MediaExtractor:
         if self.cookie_file_path:
             self.ydl_opts['cookiefile'] = self.cookie_file_path
 
+        if app_settings.PROXY_URL:
+            self.ydl_opts['proxy'] = app_settings.PROXY_URL
+            logger.info("Using Proxy for yt-dlp")
+
     def download_media(self, url: str, format_id: str, output_dir: str, progress_hook=None) -> str:
         """
         Download media to the specified directory.

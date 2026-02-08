@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     ]
     
     COOKIES_CONTENT: str = ""
+    PROXY_URL: str = ""  # Optional: For bypassing YouTube IP blocks (e.g., http://user:pass@host:port)
 
     class Config:
         case_sensitive = True
