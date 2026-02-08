@@ -4,6 +4,7 @@ import os
 import tempfile
 import random
 import time
+import base64
 from typing import Dict, Any, List
 from app.core.config import settings as app_settings
 
@@ -19,28 +20,30 @@ class MediaExtractor:
             'quiet': False,
             'no_warnings': False,
             'verbose': True,
-            'noplaylist': True,  # Single video only
-            'extract_flat': False, # Need full info for formats
-            'simulate': True, # Do not download video
+            'noplaylist': True,
+            'extract_flat': False,
+            'simulate': True,
             'skip_download': True,
             'allowed_extractors': ['default', 'youtube', 'pinterest', 'instagram', 'twitter'], 
             'socket_timeout': 30,
+            # Force IPv4 to avoid common IPv6 blocks in datacenters
+            'source_address': '0.0.0.0', 
             'outtmpl': '%(title)s.%(ext)s',
-            # Anti-bot detection measures
+            # Anti-bot measures
             'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-            'sleep_interval': random.randint(2, 5),  # Random sleep between requests
+            'sleep_interval': random.randint(2, 5),
             'extractor_args': {
                 'youtube': {
-                    'player_client': ['android', 'web'],
+                    # 'web' client is most heavily guarded. Use 'android' or 'ios'.
+                    'player_client': ['android', 'ios'],
                     'skip': ['hls', 'dash']
                 }
             },
             'http_headers': {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
                 'Accept-Language': 'en-US,en;q=0.9',
                 'Sec-Fetch-Mode': 'navigate',
-                'Referer': 'https://www.youtube.com/',
             }
         }
 
@@ -167,14 +170,25 @@ class MediaExtractor:
         return f"{m}:{s:02d}"
 
     def _write_cookies_file(self, content: str) -> str:
-        """Write cookies content to a temporary file and return the path."""
+        """
+        Write cookies content to a temporary file.
+        Supports both direct text and Base64 encoded content (safer for Env Vars).
+        """
         try:
-            # Create a named temp file that isn't automatically deleted on close 
-            # (cookies persist for the session)
+            # Try to decode Base64 first
+            try:
+                decoded = base64.b64decode(content).decode('utf-8')
+                # Check if it looks like a Netscape cookie file (starts with # usually, or contains tab separators)
+                if "# Netscape HTTP Cookie File" in decoded or "\t" in decoded:
+                    content = decoded
+            except Exception:
+                # If decode fails, assume it's raw text
+                pass
+
             fd, path = tempfile.mkstemp(suffix='.txt', text=True)
-            with os.fdopen(fd, 'w') as f:
+            with os.fdopen(fd, 'w', encoding='utf-8') as f:
                 f.write(content)
-            logger.info(f"Created temporary cookies file at {path}")
+            logger.info(f"Created temporary cookies file at {path} (Size: {len(content)} bytes)")
             return path
         except Exception as e:
             logger.error(f"Failed to create cookies file: {e}")
