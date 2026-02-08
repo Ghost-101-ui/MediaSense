@@ -45,16 +45,32 @@ class MediaExtractor:
         if self.cookie_file_path:
             self.ydl_opts['cookiefile'] = self.cookie_file_path
 
-        if app_settings.PROXY_URL:
-            self.ydl_opts['proxy'] = app_settings.PROXY_URL
-            logger.info("Using Proxy for yt-dlp")
+        if self.cookie_file_path:
+            self.ydl_opts['cookiefile'] = self.cookie_file_path
+
+        # Proxy is now applied dynamically in _get_opts based on the URL
+        self.proxy_url = app_settings.PROXY_URL
+
+    def _get_opts(self, url: str) -> Dict[str, Any]:
+        """
+        Get options with proxy applied only for YouTube.
+        """
+        opts = self.ydl_opts.copy()
+        # Check if it's a YouTube URL
+        if "youtube.com" in url or "youtu.be" in url:
+            if self.proxy_url:
+                opts['proxy'] = self.proxy_url
+                logger.info("Using Proxy for YouTube URL")
+        return opts
 
     def download_media(self, url: str, format_id: str, output_dir: str, progress_hook=None) -> str:
         """
         Download media to the specified directory.
         Returns the path to the downloaded file.
         """
-        opts = self.ydl_opts.copy()
+        Returns the path to the downloaded file.
+        """
+        opts = self._get_opts(url)
         opts['simulate'] = False
         opts['skip_download'] = False
         opts['paths'] = {'home': output_dir}
@@ -81,7 +97,7 @@ class MediaExtractor:
 
     def extract_info(self, url: str) -> Dict[str, Any]:
         try:
-            with yt_dlp.YoutubeDL(self.ydl_opts) as ydl:
+            with yt_dlp.YoutubeDL(self._get_opts(url)) as ydl:
                 info = ydl.extract_info(url, download=False)
                 return self._process_info(info)
         except Exception as e:
