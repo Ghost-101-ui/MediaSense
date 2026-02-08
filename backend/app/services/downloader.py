@@ -68,8 +68,6 @@ class MediaExtractor:
         Download media to the specified directory.
         Returns the path to the downloaded file.
         """
-        Returns the path to the downloaded file.
-        """
         opts = self._get_opts(url)
         opts['simulate'] = False
         opts['skip_download'] = False
