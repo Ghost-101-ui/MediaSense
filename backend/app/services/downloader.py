@@ -181,14 +181,21 @@ class MediaExtractor:
                 # Check if it looks like a Netscape cookie file (starts with # usually, or contains tab separators)
                 if "# Netscape HTTP Cookie File" in decoded or "\t" in decoded:
                     content = decoded
-            except Exception:
+                    logger.info(f"Successfully decoded Base64 cookies. Length: {len(content)}")
+            except Exception as e:
+                logger.warning(f"Base64 decode failed or not needed: {e}")
                 # If decode fails, assume it's raw text
                 pass
 
             fd, path = tempfile.mkstemp(suffix='.txt', text=True)
             with os.fdopen(fd, 'w', encoding='utf-8') as f:
                 f.write(content)
-            logger.info(f"Created temporary cookies file at {path} (Size: {len(content)} bytes)")
+            
+            # Debug: Read back to ensure it wrote correctly
+            with open(path, 'r', encoding='utf-8') as f:
+                first_line = f.readline().strip()
+                logger.info(f"Cookies file created at {path}. First line: {first_line[:50]}...")
+
             return path
         except Exception as e:
             logger.error(f"Failed to create cookies file: {e}")
