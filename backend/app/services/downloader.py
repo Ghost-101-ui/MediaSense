@@ -24,6 +24,8 @@ class MediaExtractor:
             'extract_flat': False,
             'simulate': True,
             'skip_download': True,
+            'ignore_no_formats_error': True,  # Don't crash if some formats are missing
+            'check_formats': False,          # Don't stricter validate formats
             'allowed_extractors': ['default', 'youtube', 'pinterest', 'instagram', 'twitter'], 
             'socket_timeout': 30,
             # Force IPv4 to avoid common IPv6 blocks in datacenters
