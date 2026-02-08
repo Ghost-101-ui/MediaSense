@@ -110,7 +110,8 @@ class MediaExtractor:
             # Simple filtering logic
             if height: # Video
                 res_str = f"{height}p"
-                if res_str not in seen_resolutions and ext != 'webm': # Prefer mp4 for compatibility
+                # Removed 'ext != webm' check to allow VP9/AV1 formats which are standard now
+                if res_str not in seen_resolutions: 
                     formats.append({
                         "resolution": res_str,
                         "ext": ext,
