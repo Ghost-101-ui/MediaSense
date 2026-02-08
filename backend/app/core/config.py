@@ -1,6 +1,5 @@
 import secrets
 from typing import List, Union
-from pydantic import validator
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
@@ -15,6 +14,8 @@ class Settings(BaseSettings):
         "http://127.0.0.1:3000",
         "http://127.0.0.1:8000",
     ]
+    
+    COOKIES_CONTENT: str = ""
 
     class Config:
         case_sensitive = True

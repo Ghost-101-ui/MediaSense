@@ -1,11 +1,20 @@
 import yt_dlp
 import logging
+import os
+import tempfile
+import random
+import time
 from typing import Dict, Any, List
+from app.core.config import settings as app_settings
 
 logger = logging.getLogger(__name__)
 
 class MediaExtractor:
     def __init__(self):
+        self.cookie_file_path = None
+        if app_settings.COOKIES_CONTENT:
+            self.cookie_file_path = self._write_cookies_file(app_settings.COOKIES_CONTENT)
+
         self.ydl_opts = {
             'quiet': False,
             'no_warnings': False,
@@ -15,9 +24,28 @@ class MediaExtractor:
             'simulate': True, # Do not download video
             'skip_download': True,
             'allowed_extractors': ['default', 'youtube', 'pinterest', 'instagram', 'twitter'], 
-            'socket_timeout': 10,
+            'socket_timeout': 30,
             'outtmpl': '%(title)s.%(ext)s',
+            # Anti-bot detection measures
+            'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+            'sleep_interval': random.randint(2, 5),  # Random sleep between requests
+            'extractor_args': {
+                'youtube': {
+                    'player_client': ['android', 'web'],
+                    'skip': ['hls', 'dash']
+                }
+            },
+            'http_headers': {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                'Accept-Language': 'en-US,en;q=0.9',
+                'Sec-Fetch-Mode': 'navigate',
+                'Referer': 'https://www.youtube.com/',
+            }
         }
+
+        if self.cookie_file_path:
+            self.ydl_opts['cookiefile'] = self.cookie_file_path
 
     def download_media(self, url: str, format_id: str, output_dir: str, progress_hook=None) -> str:
         """
@@ -137,5 +165,19 @@ class MediaExtractor:
         if h > 0:
             return f"{h}:{m:02d}:{s:02d}"
         return f"{m}:{s:02d}"
+
+    def _write_cookies_file(self, content: str) -> str:
+        """Write cookies content to a temporary file and return the path."""
+        try:
+            # Create a named temp file that isn't automatically deleted on close 
+            # (cookies persist for the session)
+            fd, path = tempfile.mkstemp(suffix='.txt', text=True)
+            with os.fdopen(fd, 'w') as f:
+                f.write(content)
+            logger.info(f"Created temporary cookies file at {path}")
+            return path
+        except Exception as e:
+            logger.error(f"Failed to create cookies file: {e}")
+            return None
 
 extractor = MediaExtractor()
