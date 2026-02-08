@@ -56,11 +56,11 @@ class MediaExtractor:
         Get options with proxy applied only for YouTube.
         """
         opts = self.ydl_opts.copy()
-        # Check if it's a YouTube URL
-        if "youtube.com" in url or "youtu.be" in url:
+        # Check if it's a YouTube or Instagram URL (both aggressively block IPs)
+        if any(domain in url for domain in ["youtube.com", "youtu.be", "instagram.com"]):
             if self.proxy_url:
                 opts['proxy'] = self.proxy_url
-                logger.info("Using Proxy for YouTube URL")
+                logger.info(f"Using Proxy for URL: {url}")
         return opts
 
     def download_media(self, url: str, format_id: str, output_dir: str, progress_hook=None) -> str:
